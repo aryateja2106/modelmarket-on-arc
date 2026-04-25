@@ -1,0 +1,35 @@
+{
+  "walletSetId": "mock-walletset-0000",
+  "blockchain": "MATIC-AMOY",
+  "mock": true,
+  "createdAt": "2026-04-25T20:13:32.270Z",
+  "sellers": [
+    {
+      "modelId": "gemini-flash",
+      "role": "seller",
+      "walletId": "wallet-000003e8",
+      "address": "0x93dbddb907a268a1ec74855b7fa33979c1328b38",
+      "name": "seller-gemini-flash"
+    },
+    {
+      "modelId": "llama-local",
+      "role": "seller",
+      "walletId": "wallet-000003e9",
+      "address": "0x9447c3f1a36cf728632504dabe6324f0355360c3",
+      "name": "seller-llama-local"
+    },
+    {
+      "modelId": "nl2shell",
+      "role": "seller",
+      "walletId": "wallet-000003ea",
+      "address": "0xedae8f70241e124715360e5e6848e1a3be5dbce7",
+      "name": "seller-nl2shell"
+    }
+  ],
+  "buyer": {
+    "role": "buyer",
+    "walletId": "wallet-000003eb",
+    "address": "0x7ed57652b00fef764b02cfbc460d0f5199768f00",
+    "name": "buyer-agent"
+  }
+}

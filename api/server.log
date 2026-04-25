@@ -1,0 +1,4 @@
+[arcmeter] listening on http://localhost:7402
+[arcmeter] registered model id=llama-70b-hf backend=huggingface
+[arcmeter] accepting MOCK signature
+[arcmeter] 200 infer model=llama-70b-hf tx=4plaeGjUaljimi88D5JGi from=0xb4228f56a3dd5e980dc4bb2ff2cc460ad79ecd9f latency=1288ms

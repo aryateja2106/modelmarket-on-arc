@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ModelMarket — Marketplace</title>
+<link rel="stylesheet" href="atlas.css" />
+<link rel="stylesheet" href="styles.css" />
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+
+<!-- NAV -->
+<header class="atlas-titlebar">
+  <div class="mm-nav-brand">ModelMarket</div>
+  <div class="mm-nav-divider"></div>
+  <nav class="mm-nav-links">
+    <a href="index.html" class="mm-nav-link">
+      <i data-lucide="activity"></i> <span>Live Stream</span>
+    </a>
+    <a href="marketplace.html" class="mm-nav-link is-active">
+      <i data-lucide="layout-grid"></i> <span>Marketplace</span>
+    </a>
+    <a href="sell.html" class="mm-nav-link">
+      <i data-lucide="upload"></i> <span>Sell</span>
+    </a>
+    <a href="seller.html" class="mm-nav-link">
+      <i data-lucide="bar-chart-2"></i> <span>Seller</span>
+    </a>
+  </nav>
+  <div class="atlas-statusbar" style="border-top:0; height:auto; padding:0; background:transparent">
+    <span class="atlas-dot" id="status-dot"></span>
+    <div style="display:flex; flex-direction:column; line-height:1">
+      <span id="status-text" style="color:var(--text-primary); font-size:var(--text-xs); font-weight:600">Connecting</span>
+      <span style="color:var(--text-muted); font-size:9px; font-family:var(--font-mono)">API :7402</span>
+    </div>
+  </div>
+</header>
+
+<!-- MAIN -->
+<div class="mm-container">
+
+  <!-- HERO STAT -->
+  <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:var(--sp-6);gap:var(--sp-4);flex-wrap:wrap">
+    <div>
+      <h2 class="mm-page-title" style="margin-bottom:2px">Marketplace</h2>
+      <div class="mm-page-sub">Buy AI inference with USDC — pay per call on Arc</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
+      <div class="label-upper" style="color:var(--text-muted)">Total settled on Arc</div>
+      <div class="mono" id="hero-settled" style="font-size:var(--text-2xl);font-weight:600;letter-spacing:-.02em;color:var(--text-primary);font-variant-numeric:tabular-nums">$0.000000</div>
+    </div>
+  </div>
+
+  <!-- FILTER ROW -->
+  <div style="display:flex;align-items:center;gap:var(--sp-2);margin-bottom:var(--sp-4)">
+    <div class="atlas-segmented">
+      <button id="filter-all"   class="atlas-segmented-item is-active" data-filter="">All</button>
+      <button id="filter-gemini" class="atlas-segmented-item" data-filter="gemini">Gemini</button>
+      <button id="filter-ollama" class="atlas-segmented-item" data-filter="ollama">Ollama</button>
+      <button id="filter-mock"   class="atlas-segmented-item" data-filter="mock">Mock</button>
+    </div>
+    <div style="margin-left:auto;font-size:var(--text-xs);color:var(--text-muted);font-family:var(--font-mono)" id="model-count">— models</div>
+  </div>
+
+  <!-- CARD GRID -->
+  <div class="mm-grid" id="model-grid">
+    <!-- skeleton cards -->
+    <div class="atlas-card" style="min-height:180px">
+      <div class="atlas-card-body" style="display:flex; flex-direction:column; gap:var(--sp-3); padding:var(--sp-4)">
+        <div style="height:14px;width:60%" class="atlas-skeleton"></div>
+        <div style="height:10px;width:40%" class="atlas-skeleton"></div>
+        <div style="height:10px;width:90%" class="atlas-skeleton"></div>
+        <div style="height:10px;width:75%" class="atlas-skeleton"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EMPTY STATE (hidden) -->
+  <div id="empty-state" style="display:none">
+    <div class="atlas-empty">
+      <div class="atlas-empty-icon"><i data-lucide="cpu" style="width:28px;height:28px"></i></div>
+      <div class="atlas-empty-title">No models listed yet</div>
+      <div class="atlas-empty-desc">Models appear here once the API server is running</div>
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<!-- MODAL (hidden) -->
+<div class="mm-backdrop" id="modal-backdrop" style="display:none" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+  <div class="atlas-dialog" id="modal">
+    <div class="atlas-dialog-header">
+      <div style="flex:1">
+        <div class="atlas-dialog-title" id="modal-title">Try model</div>
+        <div class="atlas-dialog-desc" id="modal-meta"></div>
+      </div>
+      <button class="atlas-btn-icon" id="modal-close" aria-label="Close" style="margin-top:-8px; margin-right:-8px">
+        <i data-lucide="x"></i>
+      </button>
+    </div>
+    <div class="atlas-dialog-body" style="display:flex; flex-direction:column; gap:var(--sp-4); padding:var(--sp-5)">
+      <div id="modal-payment-preview" style="background:var(--bg-active); border:1px solid var(--border-default); border-radius:var(--radius-md); padding:var(--sp-3); display:flex; flex-direction:column; gap:var(--sp-2)">
+        <div style="display:flex; justify-content:space-between">
+          <span class="label-upper">Price</span>
+          <span class="mono" id="preview-price" style="color:var(--text-primary)">$0.001000</span>
+        </div>
+        <div style="display:flex; justify-content:space-between">
+          <span class="label-upper">Network</span>
+          <span class="mono" style="color:var(--text-secondary)">Arc Testnet</span>
+        </div>
+        <div style="display:flex; justify-content:space-between">
+          <span class="label-upper">Recipient</span>
+          <span class="mono" id="preview-recipient" style="color:var(--text-secondary)">—</span>
+        </div>
+        <div style="display:flex; justify-content:space-between">
+          <span class="label-upper">Header</span>
+          <span class="mono" style="color:var(--text-secondary)">X-PAYMENT</span>
+        </div>
+      </div>
+      <div>
+        <label class="label-upper" for="modal-prompt" style="margin-bottom:var(--sp-2); display:block">Prompt</label>
+        <textarea class="mm-textarea" id="modal-prompt" placeholder="Enter your prompt…" rows="4" style="background:var(--bg-input); border:1px solid var(--border-default); border-radius:var(--radius-md); padding:var(--sp-3); color:var(--text-primary); width:100%; font-size:var(--text-sm)"></textarea>
+      </div>
+      <div id="modal-response-wrap" style="display:none">
+        <label class="label-upper" style="margin-bottom:var(--sp-2); display:block">Response</label>
+        <div class="mm-modal-response" id="modal-response" style="background:var(--bg-input); border:1px solid var(--border-default); border-radius:var(--radius-md); padding:var(--sp-3); font-family:var(--font-mono); font-size:var(--text-xs); color:var(--text-secondary); max-height:200px; overflow-y:auto; white-space:pre-wrap"></div>
+      </div>
+      <div id="modal-payment-info" style="display:none;font-size:var(--text-xxs);color:var(--text-muted);font-family:var(--font-mono); text-transform:uppercase; letter-spacing:0.05em"></div>
+    </div>
+    <div class="atlas-dialog-footer">
+      <button class="atlas-btn atlas-btn-ghost" id="modal-cancel">Cancel</button>
+      <button class="atlas-btn atlas-btn-primary" id="modal-submit">
+        <i data-lucide="zap"></i>
+        <span>Pay and run</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+<script>
+(() => {
+  const { API, fetchJSON, formatUsdc, formatUsdcShort, truncateAddr, escapeHtml, mockXPayment, setLiveStatus } = MM;
+  const POLL_MS = 3000;
+  const LIVE_THRESHOLD = 6000;
+
+  let allModels = [];
+  let activeFilter = '';
+  let lastOk = 0;
+  let activeModelId = null;
+
+  /* -------- helpers -------- */
+  const $ = id => document.getElementById(id);
+
+  function backendClass(b) {
+    if (!b) return 'mm-pill-mock';
+    const l = b.toLowerCase();
+    if (l.includes('gemini')) return 'mm-pill-gemini';
+    if (l.includes('ollama')) return 'mm-pill-ollama';
+    return 'mm-pill-mock';
+  }
+
+  function buildCard(m) {
+    const priceBase = m.priceBaseUnits || m.pricePerCallUsdc || '1000';
+    const priceLabel = formatUsdcShort(priceBase) + ' / call';
+    const sellerAddr = m.seller || m.owner || m.sellerAddress || '';
+    const backend = (m.backend || m.type || 'mock').toLowerCase();
+    let badgeClass = 'atlas-badge';
+    if (backend.includes('gemini')) badgeClass = 'atlas-badge atlas-badge-info';
+    else if (backend.includes('ollama')) badgeClass = 'atlas-badge atlas-badge-warning';
+    else if (backend.includes('hugging')) badgeClass = 'atlas-badge atlas-badge-success';
+
+    const card = document.createElement('div');
+    card.className = 'atlas-card';
+    card.dataset.backend = backend;
+    card.dataset.id = m.id;
+    card.innerHTML = `
+      <div class="atlas-card-header">
+        <span class="atlas-dot atlas-dot-primary"></span>
+        <span class="atlas-panel-title">${escapeHtml(m.name || m.id)}</span>
+      </div>
+      <div class="atlas-card-body" style="padding:var(--sp-4); min-height:100px; display:flex; flex-direction:column; gap:var(--sp-2)">
+        <div class="mm-card-owner" style="font-size:var(--text-xxs); color:var(--text-tertiary); font-family:var(--font-mono)">${truncateAddr(sellerAddr)}</div>
+        <div class="mm-card-desc" style="font-size:var(--text-sm); color:var(--text-secondary); line-height:1.5; flex:1">${escapeHtml(m.description || 'AI model available for inference on Arc.')}</div>
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-top:var(--sp-2)">
+          <span class="${badgeClass}">${escapeHtml(backend)}</span>
+          <span class="mono" style="font-size:var(--text-sm); font-weight:600; color:var(--text-primary)">${priceLabel}</span>
+        </div>
+      </div>
+      <div class="atlas-card-body" style="padding:var(--sp-2) var(--sp-4); border-top:1px solid var(--border-subtle); display:flex; align-items:center; justify-content:space-between">
+        <span style="font-size:var(--text-xxs); color:var(--text-muted); font-family:var(--font-mono)">${m.totalCalls != null ? m.totalCalls.toLocaleString() + ' calls' : ''}</span>
+        <button class="atlas-btn atlas-btn-primary atlas-btn-sm try-btn" data-id="${escapeHtml(m.id)}" data-name="${escapeHtml(m.name || m.id)}" data-meta="${escapeHtml(priceLabel + ' · ' + backend)}" data-price="${priceBase}" data-owner="${escapeHtml(sellerAddr)}">
+          <i data-lucide="zap"></i> Try it
+        </button>
+      </div>
+    `;
+    return card;
+  }
+
+  function applyFilter() {
+    const grid = $('model-grid');
+    const empty = $('empty-state');
+    const filtered = activeFilter
+      ? allModels.filter(m => (m.backend || m.type || 'mock').toLowerCase().includes(activeFilter))
+      : allModels;
+
+    grid.innerHTML = '';
+    if (filtered.length === 0) {
+      empty.style.display = 'block';
+    } else {
+      empty.style.display = 'none';
+      filtered.forEach(m => grid.appendChild(buildCard(m)));
+      lucide.createIcons();
+    }
+    $('model-count').textContent = filtered.length + ' model' + (filtered.length !== 1 ? 's' : '');
+    grid.querySelectorAll('.try-btn').forEach(btn => {
+      btn.addEventListener('click', () => openModal(btn.dataset));
+    });
+  }
+
+  function renderModels(models) {
+    allModels = models || [];
+    applyFilter();
+  }
+
+  /* -------- filter tabs -------- */
+  ['filter-all','filter-gemini','filter-ollama','filter-mock'].forEach(id => {
+    $(id).addEventListener('click', () => {
+      activeFilter = $(id).dataset.filter;
+      ['filter-all','filter-gemini','filter-ollama','filter-mock'].forEach(oid => {
+        const el = $(oid);
+        if (oid === id) {
+          el.classList.add('is-active');
+        } else {
+          el.classList.remove('is-active');
+        }
+      });
+      applyFilter();
+    });
+  });
+
+  /* -------- modal -------- */
+  function openModal({ id, name, meta, price, owner }) {
+    activeModelId = id;
+    $('modal-title').textContent = name || id;
+    $('modal-meta').textContent = meta || '';
+    $('preview-price').textContent = formatUsdc(price || '1000');
+    $('preview-recipient').textContent = truncateAddr(owner || '0x0000…0000');
+    $('modal-prompt').value = '';
+    $('modal-response').textContent = '';
+    $('modal-response').className = 'mm-modal-response';
+    $('modal-response-wrap').style.display = 'none';
+    $('modal-payment-info').style.display = 'none';
+    $('modal-submit').disabled = false;
+    $('modal-submit').querySelector('span').textContent = 'Pay and run';
+    $('modal-backdrop').style.display = 'flex';
+    setTimeout(() => $('modal-prompt').focus(), 50);
+  }
+
+  function closeModal() {
+    $('modal-backdrop').style.display = 'none';
+    activeModelId = null;
+  }
+
+  $('modal-close').addEventListener('click', closeModal);
+  $('modal-cancel').addEventListener('click', closeModal);
+  $('modal-backdrop').addEventListener('click', e => { if (e.target === $('modal-backdrop')) closeModal(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+  $('modal-submit').addEventListener('click', async () => {
+    if (!activeModelId) return;
+    const prompt = $('modal-prompt').value.trim();
+    if (!prompt) { $('modal-prompt').focus(); return; }
+
+    const submitBtn = $('modal-submit');
+    submitBtn.disabled = true;
+    
+    const respWrap = $('modal-response-wrap');
+    const respEl   = $('modal-response');
+    const payInfo  = $('modal-payment-info');
+
+    respEl.className = 'mm-modal-response is-loading';
+    respWrap.style.display = 'block';
+    payInfo.style.display = 'none';
+
+    try {
+      submitBtn.querySelector('span').textContent = 'Requesting price…';
+      respEl.textContent = 'Contacting model provider...';
+      
+      const inferUrl = API + '/v1/models/' + encodeURIComponent(activeModelId) + '/infer';
+      
+      // We wrap the mockXPayment to intercept steps for status display
+      // But since mockXPayment is in app.js, we'll just simulate the feel here
+      setTimeout(() => {
+        if (submitBtn.disabled) submitBtn.querySelector('span').textContent = 'Signing X-PAYMENT…';
+      }, 600);
+      
+      setTimeout(() => {
+        if (submitBtn.disabled) submitBtn.querySelector('span').textContent = 'Running inference…';
+      }, 1400);
+
+      const result = await mockXPayment(inferUrl, { prompt });
+      
+      respEl.className = 'mm-modal-response';
+      respEl.textContent = result.output || result.text || JSON.stringify(result, null, 2);
+      const paid = result.paid || {};
+      const proofLines = [];
+      if (paid.txId) proofLines.push('tx_id: ' + paid.txId);
+      if (paid.txHash) proofLines.push('tx_hash: ' + paid.txHash);
+      if (paid.amount) proofLines.push('amount: ' + formatUsdc(paid.amount) + ' (' + paid.amount + ' base units)');
+      if (paid.asset) proofLines.push('asset: ' + paid.asset);
+      if (paid.payTo) proofLines.push('seller: ' + paid.payTo);
+      if (paid.network) proofLines.push('network: ' + paid.network);
+      if (proofLines.length) {
+        payInfo.style.display = 'block';
+        payInfo.textContent = '✓ Settled on Arc\n' + proofLines.join('\n');
+        payInfo.style.whiteSpace = 'pre';
+        payInfo.style.fontFamily = 'var(--font-mono)';
+        payInfo.style.fontSize = '11px';
+        payInfo.style.lineHeight = '1.6';
+      }
+    } catch (err) {
+      respEl.className = 'mm-modal-response is-error';
+      respEl.textContent = err.message || 'Unknown error';
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.querySelector('span').textContent = 'Pay and run';
+    }
+  });
+
+  /* -------- poll -------- */
+  async function tick() {
+    try {
+      const [models, stats] = await Promise.all([
+        fetchJSON(API + '/v1/models'),
+        fetchJSON(API + '/v1/stats').catch(() => null),
+      ]);
+      lastOk = Date.now();
+      renderModels(models);
+      if (stats) {
+        const el = $('hero-settled');
+        const nv = formatUsdc(stats.totalUsdcSettled);
+        if (el.textContent !== nv) el.textContent = nv;
+      }
+    } catch { /* keep last data */ }
+    setLiveStatus($('status-dot'), $('status-text'), Date.now() - lastOk < LIVE_THRESHOLD);
+  }
+
+  lucide.createIcons();
+  tick();
+  setInterval(tick, POLL_MS);
+})();
+</script>
+
+<style>
+  .atlas-skeleton {
+    background: linear-gradient(90deg, #0a0a0a 0%, #171717 50%, #0a0a0a 100%);
+    background-size: 200% 100%;
+    animation: atlas-shimmer 1.6s linear infinite;
+  }
+  @keyframes atlas-shimmer { to { background-position: -200% 0; } }
+  .mm-pill-active { color: var(--text-primary) !important; background: var(--bg-active) !important; border-color: var(--border-strong) !important; }
+</style>
+</body>
+</html>

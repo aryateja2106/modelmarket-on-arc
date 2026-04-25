@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>ModelMarket — Sell a Model</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+<header class="mm-nav">
+  <div class="mm-nav-brand">ModelMarket</div>
+  <div class="mm-nav-divider"></div>
+  <nav class="mm-nav-links">
+    <a href="index.html" class="mm-nav-link">
+      <i data-lucide="activity"></i> <span>Live Stream</span>
+    </a>
+    <a href="marketplace.html" class="mm-nav-link">
+      <i data-lucide="layout-grid"></i> <span>Marketplace</span>
+    </a>
+    <a href="seller.html" class="mm-nav-link">
+      <i data-lucide="bar-chart-2"></i> <span>Seller</span>
+    </a>
+    <a href="sell.html" class="mm-nav-link is-active">
+      <i data-lucide="upload"></i> <span>Sell</span>
+    </a>
+  </nav>
+  <div class="atlas-statusbar" style="border-top:0; height:auto; padding:0; background:transparent">
+    <span class="atlas-dot" id="status-dot"></span>
+    <div style="display:flex; flex-direction:column; line-height:1">
+      <span id="status-text" style="color:var(--text-primary); font-size:var(--text-xs); font-weight:600">Connecting</span>
+      <span style="color:var(--text-muted); font-size:9px; font-family:var(--font-mono)">API :7402</span>
+    </div>
+  </div>
+</header>
+
+<div class="mm-container">
+  <h1 class="atlas-page-title">Sell your AI model</h1>
+  <p class="atlas-page-subtitle">Register a model. Earn USDC on Arc per inference call. No infra to host — point at HuggingFace, Ollama (local), or Gemini.</p>
+
+  <div class="atlas-card" style="max-width:680px; margin-top:24px">
+    <div class="atlas-card-header">
+      <span class="atlas-panel-title">Register Model</span>
+    </div>
+    <div class="atlas-card-body" style="padding:20px; display:flex; flex-direction:column; gap:14px">
+
+      <div>
+        <label style="display:block; font-size:11px; color:var(--text-tertiary); text-transform:uppercase; letter-spacing:.04em; margin-bottom:4px">Model id</label>
+        <input class="atlas-input" id="f-id" placeholder="my-mistral-7b" style="width:100%">
+        <div style="font-size:11px; color:var(--text-muted); margin-top:3px">URL slug — letters, digits, dashes</div>
+      </div>
+
+      <div>
+        <label style="display:block; font-size:11px; color:var(--text-tertiary); text-transform:uppercase; letter-spacing:.04em; margin-bottom:4px">Display name</label>
+        <input class="atlas-input" id="f-name" placeholder="Mistral 7B Instruct" style="width:100%">
+      </div>
+
+      <div>
+        <label style="display:block; font-size:11px; color:var(--text-tertiary); text-transform:uppercase; letter-spacing:.04em; margin-bottom:4px">Backend</label>
+        <select class="atlas-input" id="f-backend" style="width:100%">
+          <option value="huggingface">HuggingFace Inference API</option>
+          <option value="ollama">Ollama (local)</option>
+          <option value="gemini">Google Gemini</option>
+          <option value="mock">Mock (no real inference)</option>
+        </select>
+      </div>
+
+      <div>
+        <label style="display:block; font-size:11px; color:var(--text-tertiary); text-transform:uppercase; letter-spacing:.04em; margin-bottom:4px" id="f-model-label">HF model path</label>
+        <input class="atlas-input" id="f-model" placeholder="mistralai/Mistral-7B-Instruct-v0.2" style="width:100%; font-family:var(--font-mono)">
+        <div style="font-size:11px; color:var(--text-muted); margin-top:3px" id="f-model-hint">e.g. <code>mistralai/Mistral-7B-Instruct-v0.2</code> or your own org/model</div>
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px">
+        <div>
+          <label style="display:block; font-size:11px; color:var(--text-tertiary); text-transform:uppercase; letter-spacing:.04em; margin-bottom:4px">Price per call (USDC)</label>
+          <input class="atlas-input" id="f-price" type="number" step="0.0001" min="0.0001" max="0.01" value="0.001" style="width:100%">
+          <div style="font-size:11px; color:var(--text-muted); margin-top:3px">Cap: $0.01/call. Min: $0.0001.</div>
+        </div>
+        <div>
+          <label style="display:block; font-size:11px; color:var(--text-tertiary); text-transform:uppercase; letter-spacing:.04em; margin-bottom:4px">Your wallet address</label>
+          <input class="atlas-input" id="f-seller" placeholder="0x..." style="width:100%; font-family:var(--font-mono)">
+          <a href="#" id="f-gen-addr" style="font-size:11px; color:var(--accent-info); margin-top:3px; display:inline-block">Generate mock address</a>
+        </div>
+      </div>
+
+      <div>
+        <label style="display:block; font-size:11px; color:var(--text-tertiary); text-transform:uppercase; letter-spacing:.04em; margin-bottom:4px">Description</label>
+        <textarea class="atlas-input" id="f-desc" rows="3" placeholder="Fast 7B-param chat model fine-tuned on..." style="width:100%; resize:vertical"></textarea>
+      </div>
+
+      <div style="display:flex; gap:10px; justify-content:flex-end; padding-top:12px; border-top:1px solid var(--border-subtle)">
+        <button class="atlas-btn atlas-btn-ghost" id="f-cancel">Reset</button>
+        <button class="atlas-btn atlas-btn-primary" id="f-submit"><i data-lucide="upload"></i> List on marketplace</button>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="result" class="atlas-card" style="max-width:680px; margin-top:14px; display:none">
+    <div class="atlas-card-body" style="padding:18px">
+      <div id="result-status" style="font-weight:600; margin-bottom:10px"></div>
+      <pre id="result-body" style="font-family:var(--font-mono); font-size:11px; line-height:1.6; background:var(--bg-raised); padding:12px; border-radius:6px; overflow:auto; margin:0; color:var(--text-secondary)"></pre>
+      <div id="result-link" style="margin-top:10px"></div>
+    </div>
+  </div>
+
+  <div class="atlas-card" style="max-width:680px; margin-top:14px">
+    <div class="atlas-card-header"><span class="atlas-panel-title">Backend setup</span></div>
+    <div class="atlas-card-body" style="padding:18px; font-size:13px; line-height:1.7; color:var(--text-secondary)">
+      <strong>HuggingFace</strong>: free serverless inference for many open models. Set <code>HUGGINGFACE_TOKEN</code> in <code>arcmeter/api/.env</code>. Token: <a href="https://huggingface.co/settings/tokens" target="_blank">huggingface.co/settings/tokens</a>.<br>
+      <strong>Ollama</strong>: <code>ollama pull &lt;model&gt;</code> then enter the same name here. Runs 100% local — no key, full privacy.<br>
+      <strong>Gemini</strong>: needs <code>GOOGLE_AI_STUDIO_API_KEY</code> in <code>.env</code>. Already wired.<br>
+      <strong>Mock</strong>: no real inference. Useful to test x402 paywall without dependencies.
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+<script>
+(() => {
+  const { API, fetchJSON, setLiveStatus } = MM;
+  const $ = id => document.getElementById(id);
+
+  const labels = {
+    huggingface: { label: 'HF model path', hint: 'e.g. <code>mistralai/Mistral-7B-Instruct-v0.2</code> or your own org/model' },
+    ollama: { label: 'Ollama model name', hint: 'Run <code>ollama list</code> to see installed. e.g. <code>llama3.2:1b</code>' },
+    gemini: { label: 'Gemini model id', hint: 'e.g. <code>gemini-2.5-flash</code>, <code>gemini-2.5-pro</code>' },
+    mock: { label: 'Model field (unused)', hint: 'Mock backend ignores this' },
+  };
+  $('f-backend').addEventListener('change', () => {
+    const b = $('f-backend').value;
+    $('f-model-label').innerHTML = labels[b].label;
+    $('f-model-hint').innerHTML = labels[b].hint;
+  });
+
+  $('f-gen-addr').addEventListener('click', (e) => {
+    e.preventDefault();
+    const hex = '0x' + Array.from(crypto.getRandomValues(new Uint8Array(20))).map(b => b.toString(16).padStart(2,'0')).join('');
+    $('f-seller').value = hex;
+  });
+
+  $('f-cancel').addEventListener('click', () => {
+    ['f-id','f-name','f-model','f-seller','f-desc'].forEach(id => $(id).value = '');
+    $('f-price').value = '0.001';
+    $('result').style.display = 'none';
+  });
+
+  $('f-submit').addEventListener('click', async () => {
+    const id = $('f-id').value.trim().toLowerCase();
+    const name = $('f-name').value.trim();
+    const backend = $('f-backend').value;
+    const model = $('f-model').value.trim();
+    const priceUsdc = parseFloat($('f-price').value);
+    const seller = $('f-seller').value.trim();
+    const description = $('f-desc').value.trim();
+
+    if (!id) return showResult('error', 'Model id is required');
+    if (!/^[a-z0-9-]{2,40}$/.test(id)) return showResult('error', 'Model id must be 2-40 chars: lowercase letters, digits, dashes');
+    if (!name) return showResult('error', 'Display name is required');
+    if (!seller || !/^0x[0-9a-fA-F]{40}$/.test(seller)) return showResult('error', 'Wallet address must be 0x + 40 hex chars');
+    if (!(priceUsdc > 0 && priceUsdc <= 0.01)) return showResult('error', 'Price must be between $0.0001 and $0.01');
+    if (backend !== 'mock' && !model) return showResult('error', backend + ' backend needs a model id');
+
+    const priceBaseUnits = String(Math.round(priceUsdc * 1e6));
+    const body = { id, name, backend, model: model || null, priceBaseUnits, seller, description };
+
+    try {
+      const resp = await fetch(API + '/v1/models', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      const data = await resp.json();
+      if (!resp.ok) {
+        return showResult('error', 'Failed: ' + (data.error || resp.status), data);
+      }
+      showResult('ok', '✓ Listed on marketplace', data);
+      $('result-link').innerHTML = '<a class="atlas-btn atlas-btn-secondary" href="marketplace.html" style="text-decoration:none">View on Marketplace →</a>';
+    } catch (err) {
+      showResult('error', 'Network error: ' + err.message);
+    }
+  });
+
+  function showResult(kind, msg, body) {
+    const r = $('result');
+    const s = $('result-status');
+    const b = $('result-body');
+    r.style.display = 'block';
+    s.textContent = msg;
+    s.style.color = kind === 'ok' ? '#50e3c2' : '#ff5555';
+    b.textContent = body ? JSON.stringify(body, null, 2) : '';
+    if (kind !== 'ok') $('result-link').innerHTML = '';
+  }
+
+  let lastOk = 0;
+  async function statusTick() {
+    try { await fetchJSON(API + '/healthz'); lastOk = Date.now(); } catch {}
+    setLiveStatus($('status-dot'), $('status-text'), Date.now() - lastOk < 6000);
+  }
+  statusTick();
+  setInterval(statusTick, 3000);
+
+  lucide.createIcons();
+})();
+</script>
+
+</body>
+</html>

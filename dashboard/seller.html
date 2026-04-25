@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ModelMarket — Seller Dashboard</title>
+<link rel="stylesheet" href="atlas.css" />
+<link rel="stylesheet" href="styles.css" />
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+
+<!-- NAV -->
+<header class="atlas-titlebar">
+  <div class="mm-nav-brand">ModelMarket</div>
+  <div class="mm-nav-divider"></div>
+  <nav class="mm-nav-links">
+    <a href="index.html" class="mm-nav-link">
+      <i data-lucide="activity"></i> <span>Live Stream</span>
+    </a>
+    <a href="marketplace.html" class="mm-nav-link">
+      <i data-lucide="layout-grid"></i> <span>Marketplace</span>
+    </a>
+    <a href="seller.html" class="mm-nav-link is-active">
+      <i data-lucide="bar-chart-2"></i> <span>Seller</span>
+    </a>
+    <a href="sell.html" class="mm-nav-link">
+      <i data-lucide="upload"></i> <span>Sell</span>
+    </a>
+  </nav>
+  <div class="atlas-statusbar" style="border-top:0; height:auto; padding:0; background:transparent">
+    <span class="atlas-dot" id="status-dot"></span>
+    <div style="display:flex; flex-direction:column; line-height:1">
+      <span id="status-text" style="color:var(--text-primary); font-size:var(--text-xs); font-weight:600">Connecting</span>
+      <span style="color:var(--text-muted); font-size:9px; font-family:var(--font-mono)">API :7402</span>
+    </div>
+  </div>
+</header>
+
+<!-- MAIN -->
+<div class="mm-container">
+
+  <div class="mm-page-header">
+    <h2 class="mm-page-title">Seller Dashboard</h2>
+    <span class="mm-page-sub">Earnings from Arc USDC settlements</span>
+  </div>
+
+  <!-- ADDRESS INPUT -->
+  <div class="atlas-card" style="margin-bottom:var(--sp-5)">
+    <div class="atlas-card-header">
+      <span class="atlas-panel-title">Seller Account</span>
+      <span id="load-method" style="margin-left:auto; font-size:var(--text-xxs); color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em"></span>
+    </div>
+    <div class="atlas-card-body" style="padding:var(--sp-4)">
+      <div style="display:flex; gap:var(--sp-2)">
+        <input class="atlas-input mono" type="text" id="addr-input" placeholder="0x… or ENS" autocomplete="off" spellcheck="false" style="flex:1" />
+        <button class="atlas-btn atlas-btn-secondary" id="addr-load">
+          <i data-lucide="search"></i> Load
+        </button>
+      </div>
+      <div id="addr-error" style="display:none;margin-top:var(--sp-2);font-size:var(--text-xs);color:var(--status-error)"></div>
+    </div>
+  </div>
+
+  <!-- EARNINGS HERO -->
+  <div class="atlas-card" style="margin-bottom:var(--sp-4)">
+    <div class="atlas-card-header">
+      <span class="atlas-panel-title">Revenue Overview</span>
+      <span class="mono" style="margin-left:auto; font-size:var(--text-xxs); color:var(--text-tertiary)" id="last-updated"></span>
+    </div>
+    <div class="atlas-card-body" style="padding:var(--sp-6); display:flex; flex-direction:column; gap:var(--sp-6)">
+      <div class="mm-earnings-hero">
+        <div class="mm-earnings-amount mm-earnings-tick" id="hero-earned" style="font-size: clamp(32px, 8vw, 64px); letter-spacing:-0.04em">$—</div>
+        <div class="label-upper" style="color:var(--text-muted); margin-top:var(--sp-1)">USDC settled on Arc</div>
+      </div>
+      
+      <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:var(--sp-3)">
+        <div class="atlas-stat">
+          <div class="atlas-stat-label">Total Calls</div>
+          <div class="atlas-stat-value" id="hero-calls" style="font-size:var(--text-xl)">—</div>
+        </div>
+        <div class="atlas-stat">
+          <div class="atlas-stat-label">Models Listed</div>
+          <div class="atlas-stat-value" id="hero-models" style="font-size:var(--text-xl)">—</div>
+        </div>
+        <div class="atlas-stat">
+          <div class="atlas-stat-label">Avg / Call</div>
+          <div class="atlas-stat-value" id="hero-avg" style="font-size:var(--text-xl)">—</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODEL BREAKDOWN -->
+  <div class="atlas-card" id="models-section" style="display:none">
+    <div class="atlas-card-header">
+      <span class="atlas-panel-title">Model performance</span>
+    </div>
+    <div class="atlas-card-body" style="padding:0">
+      <table class="atlas-table">
+        <thead>
+          <tr>
+            <th>Model</th>
+            <th style="width:100px">Type</th>
+            <th style="width:120px; text-align:right">Calls</th>
+            <th style="width:140px; text-align:right">Earned</th>
+          </tr>
+        </thead>
+        <tbody id="models-list">
+          <!-- rows injected here -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- EMPTY STATE -->
+  <div id="empty-state" style="display:none">
+    <div class="atlas-empty">
+      <div class="atlas-empty-icon"><i data-lucide="wallet" style="width:28px;height:28px"></i></div>
+      <div class="atlas-empty-title">No earnings found</div>
+      <div class="atlas-empty-desc" id="empty-desc">Enter a seller address above to load earnings</div>
+    </div>
+  </div>
+
+  <!-- PLACEHOLDER (initial state) -->
+  <div id="placeholder">
+    <div class="atlas-empty">
+      <div class="atlas-empty-icon"><i data-lucide="bar-chart-2" style="width:28px;height:28px"></i></div>
+      <div class="atlas-empty-title">Enter a seller address</div>
+      <div class="atlas-empty-desc">Load earnings data to see your USDC revenue from Arc</div>
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<script src="app.js"></script>
+<script>
+(() => {
+  const { API, fetchJSON, formatUsdc, formatUsdcShort, truncateAddr, escapeHtml, animateNumber, setLiveStatus } = MM;
+  const POLL_MS = 2000;
+  const LIVE_THRESHOLD = 6000;
+
+  const $ = id => document.getElementById(id);
+  let currentAddr = '';
+  let pollTimer = null;
+  let lastOk = 0;
+  let prevEarned = 0n;
+  let prevCalls = 0;
+
+  /* -------- load first seller from /v1/models -------- */
+  async function loadDefaultAddr() {
+    try {
+      const models = await fetchJSON(API + '/v1/models');
+      if (Array.isArray(models) && models.length > 0) {
+        const addr = models[0].seller || models[0].owner || models[0].sellerAddress || '';
+        if (addr) {
+          $('addr-input').value = addr;
+          startPolling(addr);
+        }
+      }
+    } catch { /* ignore — API not up */ }
+  }
+
+  /* -------- render earnings -------- */
+  function renderEarnings(data) {
+    if (!data) return;
+
+    const earned = data.totalUsdcSettled || data.totalUsdcEarned || data.totalEarned || '0';
+    const calls  = Number(data.totalCalls || 0);
+    const models = Array.isArray(data.models) ? data.models : [];
+
+    // big earnings counter
+    try {
+      const earnedB = BigInt(String(earned));
+      const earnedF = formatUsdc(earned);
+      const heroEl  = $('hero-earned');
+      if (earned !== String(prevEarned)) {
+        heroEl.classList.add('is-up');
+        setTimeout(() => heroEl.classList.remove('is-up'), 600);
+      }
+      heroEl.textContent = earnedF;
+      prevEarned = earnedB;
+    } catch { $('hero-earned').textContent = formatUsdc(earned); }
+
+    // calls counter
+    const callsEl = $('hero-calls');
+    if (calls !== prevCalls) {
+      animateNumber(callsEl, prevCalls, calls, 400);
+      prevCalls = calls;
+    } else {
+      callsEl.textContent = calls.toLocaleString();
+    }
+
+    $('hero-models').textContent = models.length;
+
+    // avg per call
+    if (calls > 0) {
+      try {
+        const earnedB = BigInt(String(earned));
+        const avg = earnedB / BigInt(calls);
+        $('hero-avg').textContent = formatUsdcShort(avg.toString());
+      } catch { $('hero-avg').textContent = '—'; }
+    } else {
+      $('hero-avg').textContent = '—';
+    }
+
+    // timestamp
+    $('last-updated').textContent = 'updated ' + new Date().toTimeString().slice(0, 8);
+
+    // models list
+    const section = $('models-section');
+    const list    = $('models-list');
+    if (models.length > 0) {
+      section.style.display = 'block';
+      list.innerHTML = models.map(m => {
+        const earned  = formatUsdc(m.totalUsdcEarned || m.earned || '0');
+        const mCalls  = Number(m.totalCalls || m.calls || 0);
+        const backend = (m.backend || m.type || 'mock').toLowerCase();
+        let badgeClass = 'atlas-badge';
+        if (backend.includes('gemini')) badgeClass = 'atlas-badge atlas-badge-info';
+        else if (backend.includes('ollama')) badgeClass = 'atlas-badge atlas-badge-warning';
+        return `
+          <tr>
+            <td><span style="color:var(--text-primary); font-weight:500">${escapeHtml(m.name || m.id || '—')}</span></td>
+            <td><span class="${badgeClass}">${escapeHtml(backend)}</span></td>
+            <td style="text-align:right"><span class="mono">${mCalls.toLocaleString()}</span></td>
+            <td style="text-align:right"><span class="mono" style="color:var(--text-primary); font-weight:600">${earned}</span></td>
+          </tr>
+        `;
+      }).join('');
+    } else {
+      section.style.display = 'none';
+    }
+
+    $('placeholder').style.display = 'none';
+    $('empty-state').style.display = 'none';
+  }
+
+  /* -------- fetch earnings -------- */
+  async function fetchEarnings(addr) {
+    try {
+      const data = await fetchJSON(API + '/v1/sellers/' + encodeURIComponent(addr) + '/earnings');
+      lastOk = Date.now();
+      $('addr-error').style.display = 'none';
+      renderEarnings(data);
+    } catch (err) {
+      if (err.status === 404) {
+        $('addr-error').textContent = 'No earnings found for this address.';
+        $('addr-error').style.display = 'block';
+        $('placeholder').style.display = 'none';
+        $('empty-state').style.display = 'block';
+        $('empty-desc').textContent = 'No earnings found for ' + truncateAddr(addr);
+        $('models-section').style.display = 'none';
+        $('hero-earned').textContent = '$0.000000';
+        $('hero-calls').textContent  = '0';
+        $('hero-models').textContent = '0';
+        $('hero-avg').textContent    = '—';
+      }
+      // keep last data on network error
+    }
+    setLiveStatus($('status-dot'), $('status-text'), Date.now() - lastOk < LIVE_THRESHOLD);
+  }
+
+  function startPolling(addr) {
+    if (pollTimer) clearInterval(pollTimer);
+    currentAddr = addr.trim();
+    if (!currentAddr) return;
+    fetchEarnings(currentAddr);
+    pollTimer = setInterval(() => fetchEarnings(currentAddr), POLL_MS);
+  }
+
+  /* -------- address input -------- */
+  $('addr-load').addEventListener('click', () => {
+    const v = $('addr-input').value.trim();
+    if (!v) { $('addr-input').focus(); return; }
+    $('addr-error').style.display = 'none';
+    $('load-method').textContent = '';
+    startPolling(v);
+  });
+
+  $('addr-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') $('addr-load').click();
+  });
+
+  /* -------- init -------- */
+  lucide.createIcons();
+  loadDefaultAddr();
+  // still do status checks even without address
+  setInterval(() => {
+    setLiveStatus($('status-dot'), $('status-text'), Date.now() - lastOk < LIVE_THRESHOLD);
+  }, 2000);
+})();
+</script>
+</body>
+</html>

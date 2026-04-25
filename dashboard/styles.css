@@ -1,0 +1,168 @@
+/* ==========================================================================
+   ModelMarket — Dashboard Overrides
+   Extends Atlas design system with project-specific utilities.
+   ========================================================================== */
+
+:root {
+  /* Brand specific colors if any */
+  --brand-success: #50e3c2;
+}
+
+/* ==========================================================================
+   Nav overrides (Atlas titlebar as nav)
+   ========================================================================== */
+.mm-nav-brand {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+  flex-shrink: 0;
+}
+
+.mm-nav-divider {
+  width: 1px;
+  height: 16px;
+  background: var(--border-default);
+  flex-shrink: 0;
+}
+
+.mm-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex: 1;
+}
+
+.mm-nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1h);
+  height: var(--h-titlebar);
+  padding: 0 var(--space-3);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--text-tertiary);
+  border-bottom: 2px solid transparent;
+  transition: background-color 120ms ease, color 120ms ease, border-color 120ms ease;
+}
+
+.mm-nav-link:hover {
+  color: var(--text-secondary);
+  background: var(--bg-hover);
+}
+
+.mm-nav-link.is-active {
+  color: var(--text-primary);
+  border-bottom-color: var(--accent-primary);
+  background: var(--bg-tab-active);
+}
+
+.mm-nav-link svg { width: 14px; height: 14px; stroke-width: 1.5; }
+
+/* ==========================================================================
+   Layout & Typography
+   ========================================================================== */
+.mm-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-8) var(--space-6);
+}
+
+.mm-page-header {
+  margin-bottom: var(--space-6);
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+}
+
+.mm-page-title {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.mm-page-sub {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+
+/* ==========================================================================
+   Stat Grid (Custom Layout)
+   ========================================================================== */
+.mm-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-3);
+  margin-bottom: var(--space-6);
+}
+
+.mm-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--space-4);
+}
+
+/* ==========================================================================
+   ModelMarket Specific Utilities
+   ========================================================================== */
+
+/* Animation for stat changes */
+@keyframes mm-stat-flash {
+  0% { color: var(--accent-highlight); }
+  100% { color: var(--text-primary); }
+}
+.is-flash {
+  animation: mm-stat-flash 0.4s ease-out;
+}
+
+/* Live row animation */
+table.atlas-table tbody tr.mm-row-new td { 
+  background: rgba(0, 112, 243, 0.08); 
+}
+table.atlas-table tbody tr.mm-row-new { 
+  animation: mm-row-in 0.4s var(--ease-out-expo); 
+}
+
+@keyframes mm-row-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Modal specific textareas */
+.mm-textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+/* Earnings Counter */
+.mm-earnings-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.mm-earnings-amount {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.mm-earnings-tick.is-up { 
+  color: var(--brand-success);
+  transition: color 0.6s ease;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .mm-stats { grid-template-columns: repeat(2, 1fr); }
+  .mm-grid  { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 600px) {
+  .mm-stats { grid-template-columns: 1fr 1fr; }
+  .mm-nav-brand { display: none; }
+  .mm-container { padding: var(--space-6) var(--space-3); }
+}

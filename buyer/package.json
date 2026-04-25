@@ -1,0 +1,17 @@
+{
+  "name": "arcmeter-buyer",
+  "version": "0.1.0",
+  "description": "ArcMeter buyer agent — hammers an x402-metered API to generate paid transactions (mock-signing for hackathon speed).",
+  "private": true,
+  "type": "commonjs",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node buyer.js",
+    "multi": "node multi-buyer.js"
+  },
+  "dependencies": {
+    "ethers": "^6.16.0"
+  }
+}
