@@ -1,1 +1,9 @@
 .env
+.env.local
+node_modules/
+*.log
+server.log
+.omc/state/
+.DS_Store
+transactions.jsonl
+wallets-real.json

@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ModelMarket on Arc — Cover</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: #000; color: #ededed; font-family: -apple-system, "Inter", system-ui, sans-serif; }
+  body { width: 1920px; height: 1080px; padding: 80px; display: flex; flex-direction: column; justify-content: space-between; }
+  .top { display: flex; justify-content: space-between; align-items: flex-start; }
+  .brand { display: flex; align-items: center; gap: 14px; font-size: 22px; font-weight: 600; letter-spacing: -0.01em; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: #50e3c2; box-shadow: 0 0 12px #50e3c2; }
+  .pill { font-size: 12px; padding: 4px 9px; border: 1px solid #2a2a2a; border-radius: 9999px; color: #888; font-weight: 500; }
+  .badge { font-size: 13px; padding: 6px 12px; border: 1px solid #1a3a5c; background: rgba(0,112,243,.08); color: #4fa8ff; border-radius: 4px; font-weight: 500; }
+  h1 { font-size: 130px; font-weight: 700; line-height: .98; letter-spacing: -0.04em; max-width: 1300px; }
+  h1 em { font-style: normal; color: #50e3c2; }
+  .sub { margin-top: 30px; font-size: 30px; color: #999; line-height: 1.4; max-width: 1100px; font-weight: 400; }
+  .row-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-top: 40px; max-width: 1500px; }
+  .stat { padding: 24px 28px; border: 1px solid #1a1a1a; border-radius: 6px; background: #060606; }
+  .stat-label { font-size: 11px; text-transform: uppercase; letter-spacing: .12em; color: #666; margin-bottom: 12px; font-weight: 600; }
+  .stat-val { font-size: 38px; font-weight: 700; font-family: "JetBrains Mono", "SF Mono", monospace; color: #ededed; line-height: 1; }
+  .stat-val .dim { color: #666; font-weight: 500; }
+  .stat-sub { font-size: 12px; color: #777; margin-top: 8px; }
+  .bottom { display: flex; justify-content: space-between; align-items: flex-end; }
+  .stack { font-size: 16px; color: #888; font-family: "JetBrains Mono", "SF Mono", monospace; }
+  .stack b { color: #ededed; font-weight: 600; }
+  .url { font-size: 14px; color: #555; font-family: "JetBrains Mono", "SF Mono", monospace; }
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="brand">
+    <span class="dot"></span>
+    <span>ModelMarket</span>
+    <span class="pill">on Arc</span>
+  </div>
+  <span class="badge">Per-API Monetization · Agent-to-Agent</span>
+</div>
+<div>
+  <h1>Stripe-metered<br>USDC for the<br><em>agent economy.</em></h1>
+  <p class="sub">A marketplace where developers list local AI models and earn USDC per inference call. Every call settles on Arc — sub-cent, sub-second, gas-free.</p>
+  <div class="row-stats">
+    <div class="stat"><div class="stat-label">Per-call price</div><div class="stat-val">$0.0005<span class="dim">–$0.008</span></div><div class="stat-sub">≤$0.01 hackathon cap</div></div>
+    <div class="stat"><div class="stat-label">Demo settlements</div><div class="stat-val">61<span class="dim"> tx</span></div><div class="stat-sub">across 5 listed models</div></div>
+    <div class="stat"><div class="stat-label">Margin per call</div><div class="stat-val">+90<span class="dim">%</span></div><div class="stat-sub">vs −$2.40 on Ethereum</div></div>
+    <div class="stat"><div class="stat-label">Backends</div><div class="stat-val">4</div><div class="stat-sub">Gemini · HF · Ollama · mock</div></div>
+  </div>
+</div>
+<div class="bottom">
+  <div class="stack"><b>Stack:</b>&nbsp; Arc · USDC · Circle Wallets · x402 · Google Gemini · HuggingFace · Ollama</div>
+  <div class="url">github.com/aryateja2106/modelmarket-on-arc</div>
+</div>
+</body>
+</html>
