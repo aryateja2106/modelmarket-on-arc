@@ -37,6 +37,15 @@ const models = [
     seller: '0x1111111111111111111111111111111111111111',
     description: 'Convert natural language to shell commands (mock inference, always available)',
   },
+  {
+    id: 'llama-70b-hf',
+    name: 'Llama 3.3 70B (HF)',
+    backend: 'huggingface',
+    model: 'meta-llama/Llama-3.3-70B-Instruct',
+    priceBaseUnits: '3000',
+    seller: '0x5555555555555555555555555555555555555555',
+    description: 'Llama 3.3 70B via HuggingFace Router (Fireworks). Open-weights, premium quality, $0.003/call.',
+  },
 ];
 
 function getModel(id) {
